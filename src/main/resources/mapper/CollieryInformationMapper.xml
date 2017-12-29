@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gmsj.mapper.CollieryInformationMapper" >
+  <resultMap id="BaseResultMap" type="com.gmsj.model.CollieryInformation" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="artificial_name" property="artificialName" jdbcType="VARCHAR" />
+    <result column="group_id" property="groupId" jdbcType="INTEGER" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="contacts" property="contacts" jdbcType="VARCHAR" />
+    <result column="contacts_phone" property="contactsPhone" jdbcType="VARCHAR" />
+    <result column="contacts_email" property="contactsEmail" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="longitude" property="longitude" jdbcType="REAL" />
+    <result column="latitude" property="latitude" jdbcType="REAL" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="latitude_longitude" property="latitudeLongitude" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  
+  <select id="listAllLatitudeAndlongitudeByYear" parameterType="java.lang.Integer" resultType="com.gmsj.common.vo.industryAnaylse.CoalSpreadMapVO" >
+  	SELECT DISTINCT
+		t.`name`,
+		t.latitude,
+		t.longitude
+	FROM
+		colliery_information t,
+		certificates t1
+	WHERE
+		t1.colliery_id = t.id
+	AND t.longitude IS NOT NULL
+	AND t.latitude IS NOT NULL
+	limit 100
+  </select>
+
+  <select id="listGroupMapByGroupIdAndYear" resultType="com.gmsj.common.vo.colleryAnalyse.MapItemVO">
+      SELECT DISTINCT
+          t.longitude,
+          t.latitude,
+          t.latitude_longitude AS longitudeAndlatitude,
+          t.`name`
+      FROM
+          colliery_information t,
+          `group` t1,
+          certificates t2
+      WHERE
+          t.group_id = t1.id
+      AND t2.colliery_id = t.id
+      AND t1.id = #{groupId}
+      AND YEAR (t2.business_license_start) <![CDATA[<=]]> #{year}
+      AND YEAR (t2.business_license_end) <![CDATA[>=]]> #{year}
+      AND t.latitude_longitude IS NOT NULL
+      AND t.latitude IS NOT NULL
+      AND t.longitude IS NOT NULL
+  </select>
+
+  <select id="getMapByCoalIdAndYear" resultType="com.gmsj.common.vo.colleryAnalyse.MapItemVO">
+    SELECT
+        t.`name`,
+        t.longitude,
+        t.latitude,
+        t.latitude_longitude AS longitudeAndlatitude
+    FROM
+        colliery_information t
+    WHERE
+        t.id = #{coalId}
+  </select>
+
+
+
+  
+</mapper>

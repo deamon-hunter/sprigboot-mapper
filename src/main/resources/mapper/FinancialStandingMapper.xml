@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gmsj.mapper.FinancialStandingMapper" >
+  <resultMap id="BaseResultMap" type="com.gmsj.model.FinancialStanding" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="colliery_id" property="collieryId" jdbcType="BIGINT" />
+    <result column="equity_ratio" property="equityRatio" jdbcType="VARCHAR" />
+    <result column="investment_methods" property="investmentMethods" jdbcType="VARCHAR" />
+    <result column="lastyear_revenue" property="lastyearRevenue" jdbcType="VARCHAR" />
+    <result column="lastyear_operating_costs" property="lastyearOperatingCosts" jdbcType="VARCHAR" />
+    <result column="lastyear_income_tax" property="lastyearIncomeTax" jdbcType="VARCHAR" />
+    <result column="lastyear_sales_tax" property="lastyearSalesTax" jdbcType="VARCHAR" />
+    <result column="lastyear_vat" property="lastyearVat" jdbcType="VARCHAR" />
+    <result column="lastyear_construction_tax" property="lastyearConstructionTax" jdbcType="VARCHAR" />
+    <result column="lastyear_education_additional_tax" property="lastyearEducationAdditionalTax" jdbcType="VARCHAR" />
+    <result column="lastyear_resource_tax" property="lastyearResourceTax" jdbcType="VARCHAR" />
+    <result column="onduty_workers" property="ondutyWorkers" jdbcType="INTEGER" />
+    <result column="is_mortgage" property="isMortgage" jdbcType="BIT" />
+    <result column="is_financing_or_lending" property="isFinancingOrLending" jdbcType="BIT" />
+    <result column="financing_or_lending_total_amount" property="financingOrLendingTotalAmount" jdbcType="VARCHAR" />
+    <result column="is_economic_dissension" property="isEconomicDissension" jdbcType="BIT" />
+    <result column="remarks" property="remarks" jdbcType="VARCHAR" />
+    <result column="year" property="year" jdbcType="DATE" />
+  </resultMap>
+
+  <select id="queryProfitInfoByYear" resultType="com.gmsj.common.vo.industryAnaylse.ColleryProfitVO" >
+    SELECT
+        SUM(CASE WHEN t.income <![CDATA[ > ]]> 0 THEN 1 ELSE 0 END) AS profitNum,
+        SUM(CASE WHEN t.income <![CDATA[ <= ]]>  0 THEN 1 ELSE 0 END) AS noProfitNum
+    FROM
+        (
+            SELECT
+                IFNULL(lastyear_revenue,0) -
+                IFNULL(lastyear_operating_costs,0) -
+                IFNULL(lastyear_income_tax,0) -
+                IFNULL(lastyear_sales_tax,0) -
+                IFNULL(lastyear_vat,0) -
+                IFNULL(lastyear_construction_tax,0) -
+                IFNULL(lastyear_education_additional_tax,0) -
+                IFNULL(lastyear_resource_tax,0) AS income
+            FROM
+                financial_standing
+            WHERE
+               YEAR(`year`) = 2017
+            ORDER BY
+                id
+    )t
+
+  </select>
+
+</mapper>

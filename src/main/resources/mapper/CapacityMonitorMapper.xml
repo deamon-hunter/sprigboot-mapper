@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gmsj.mapper.CapacityMonitorMapper">
+  <resultMap id="BaseResultMap" type="com.gmsj.model.CapacityMonitor">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="colliery_id" jdbcType="BIGINT" property="collieryId" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="value" jdbcType="INTEGER" property="value" />
+  </resultMap>
+
+  <select id="listCapacityDetectionInfoByCoalId" resultType="com.gmsj.common.vo.CommonVO" >
+    SELECT
+        t.type,
+        t.value AS count
+    FROM
+        capacity_monitor t,
+        colliery_information t1
+    WHERE
+        t.colliery_id = t1.id
+        AND t.colliery_id = #{coalId}
+  </select>
+
+
+
+</mapper>

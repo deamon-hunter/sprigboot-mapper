@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gmsj.mapper.BankMortgageMapper" >
+  <resultMap id="BaseResultMap" type="com.gmsj.model.BankMortgage" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="is_mortgage" property="isMortgage" jdbcType="BIT" />
+    <result column="colliery_id" property="collieryId" jdbcType="BIGINT" />
+    <result column="approval_file_number" property="approvalFileNumber" jdbcType="VARCHAR" />
+    <result column="mortgagor" property="mortgagor" jdbcType="VARCHAR" />
+    <result column="mortgagee" property="mortgagee" jdbcType="VARCHAR" />
+    <result column="guaranty" property="guaranty" jdbcType="VARCHAR" />
+    <result column="mortgage_start" property="mortgageStart" jdbcType="DATE" />
+    <result column="mortgage_end" property="mortgageEnd" jdbcType="DATE" />
+  </resultMap>
+
+  <select id="getTotalMortgageNum" resultType="java.lang.Integer" >
+    SELECT
+        IFNULL(SUM(1),0) AS totalNum
+    FROM
+        bank_mortgage t,
+        colliery_information t1,
+        `group` t2
+    WHERE
+        t.colliery_id = t1.id
+    AND t1.group_id = t2.id
+    AND t.is_mortgage = 1
+    AND t2.id = #{groupId}
+    AND YEAR (t.mortgage_start) = #{curYear}
+
+  </select>
+
+  <select id="getMortgageNumByYearAndCoalId" resultType="java.lang.Integer" >
+    SELECT
+        SUM(1) AS totalNum
+    FROM
+        bank_mortgage t,
+        colliery_information t1
+    WHERE
+        t.colliery_id = t1.id
+        AND t.is_mortgage = 1
+        AND t.colliery_id = #{coalId}
+        AND YEAR(t.mortgage_start) = #{year}
+  </select>
+
+
+</mapper>

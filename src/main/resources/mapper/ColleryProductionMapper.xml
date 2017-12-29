@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gmsj.mapper.ColleryProductionMapper" >
+  <resultMap id="BaseResultMap" type="com.gmsj.model.ColleryProduction" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="colliery_id" property="collieryId" jdbcType="BIGINT" />
+    <result column="coal_id" property="coalId" jdbcType="INTEGER" />
+    <result column="coal_production_month" property="coalProductionMonth" jdbcType="REAL" />
+    <result column="year" property="year" jdbcType="DATE" />
+    <result column="month" property="month" jdbcType="INTEGER" />
+  </resultMap>
+
+   <select id="getHigherNumByYear" resultType="java.lang.Float" >
+	  SELECT
+		  IFNULL(SUM(t.higherCount),0) AS higherCount
+	  FROM
+		  (
+			  SELECT
+			  	YEAR(business_license_start) AS year ,
+				  SUM( CASE WHEN license_scale <![CDATA[ >= ]]> #{standardProduction} THEN 1 ELSE 0 END ) AS higherCount
+			  FROM
+			  	  certificates
+			  WHERE
+			  	  YEAR(business_license_start) <![CDATA[ <= ]]> #{year}
+			  GROUP BY
+			  	  YEAR(business_license_start)
+	 	 ) t
+   </select>
+
+	<select id="getLowerNumByYear" resultType="java.lang.Float" >
+	  SELECT
+		  IFNULL(SUM(t.lowerCount),0) AS lowerCount
+	  FROM
+		  (
+			  SELECT
+			  	YEAR(business_license_start) AS year ,
+				  SUM( CASE WHEN license_scale <![CDATA[ < ]]> #{standardProduction} THEN 1 ELSE 0 END ) AS lowerCount
+			  FROM
+			  	  certificates
+			  WHERE
+			  	  YEAR(business_license_start) <![CDATA[ <= ]]> #{year}
+			  GROUP BY
+			  	  YEAR(business_license_start)
+	 	 ) t
+	</select>
+
+  <select id="listTotalStockByYear" resultType="com.gmsj.common.vo.CommonVO" >
+  	SELECT
+		SUM(coal_production_month) AS count,
+	  	CONCAT(`year`,'年') AS type
+	FROM
+		collery_production
+	WHERE
+		`year` BETWEEN #{preYear} AND #{currentYear}
+	GROUP BY
+		`year`
+  </select>
+  
+  
+  <select id="listProductionChange"  resultType="com.gmsj.common.vo.industryAnaylse.CommonInfoVO">
+  	SELECT
+		CONCAT(`year`,'年') AS YEAR,
+		SUM(coal_production_month) AS num
+	FROM
+		collery_production
+	WHERE
+		`year` BETWEEN #{startYear} AND #{endYear}
+	GROUP BY
+		`year`
+  </select>
+  
+  
+  <select id="getAllProductionByYear" parameterType="java.lang.Integer" resultType="java.lang.Float" >
+  	SELECT
+		SUM(coal_production_month) AS yearProduction
+	FROM
+		collery_production
+	WHERE
+		`year` = #{currentYear}
+  </select>
+  
+  
+  <select id="listTopTenCollery" parameterType="java.lang.Integer" resultType="com.gmsj.common.vo.industryAnaylse.TopTenCollieryVO" >
+  	SELECT
+		t1.`name` AS name ,
+		SUM(t.coal_production_month) AS production
+	FROM
+		collery_production t,
+		colliery_information t1
+	WHERE
+		t.colliery_id = t1.id
+	AND t.`year` = #{currentYear}
+	GROUP BY
+		t.`year`,
+		t.colliery_id
+	ORDER BY
+		production DESC
+	LIMIT #{rowNum}
+  </select>
+
+  <select id="getGroupProductionByYearAndMonth" resultType="com.gmsj.common.vo.CommonVO" >
+	SELECT
+		SUM(tt.totalMonth) AS count,
+		CONCAT(tt.`month`,'月') AS type
+	FROM
+		(
+			SELECT
+				t.colliery_id,
+				t.`month`,
+				SUM(t.coal_production_month) AS totalMonth
+			FROM
+				collery_production t,
+				colliery_information t1,
+				`group` t2
+			WHERE
+				t.colliery_id = t1.id
+				AND t1.group_id = t2.id
+				AND t.`year` = #{year}
+				AND t.`month` = #{month}
+				AND t2.id = #{groupId}
+			GROUP BY
+				t.colliery_id,
+				t.`month`
+		) tt
+	GROUP BY
+		tt.`month`
+  </select>
+
+  <select id="listTotalCapacityInfoByGroupId" resultType="com.gmsj.common.vo.CommonVO" >
+	SELECT
+		t1.name AS type,
+		SUM(t.coal_production_month) AS count
+	FROM
+		collery_production t,
+		colliery_information t1,
+		`group` t2
+	WHERE
+		t.colliery_id = t1.id
+	AND t1.group_id = t2.id
+	AND	t1.group_id = #{groupId}
+	AND t.year = #{year}
+	GROUP BY
+		t.colliery_id
+  </select>
+
+  <select id="getTotalCapacityByGroupId" resultType="java.lang.Long" >
+	SELECT
+		SUM(t.coal_production_month) AS totalProduction
+	FROM
+		collery_production t,
+		colliery_information t1,
+		`group` t2
+	WHERE
+		t.colliery_id = t1.id
+	AND t1.group_id = t2.id
+	AND t1.group_id = #{groupId}
+	AND t.year = #{curYear}
+  </select>
+
+
+  <select id="getColleryProductionRangeInfoByCoalId" resultType="com.gmsj.common.vo.CommonVO" >
+    SELECT
+		IFNULL(SUM(t.coal_production_month),0) AS count,
+		CONCAT(t.MONTH,'月') AS type
+	FROM
+		collery_production t,
+		colliery_information t1
+	WHERE
+		t.colliery_id = t1.id
+	    AND	t1.id = #{coalId}
+	    AND  t.`year` = #{year}
+	    AND t.month = #{month}
+  </select>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+</mapper>

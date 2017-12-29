@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gmsj.mapper.InfluenceFactorMapper" >
+  <resultMap id="BaseResultMap" type="com.gmsj.model.InfluenceFactor" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="factor_type" property="factorType" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="value" property="value" jdbcType="INTEGER" />
+    <result column="date" property="date" jdbcType="DATE" />
+  </resultMap>
+
+  <select id="listInfo" resultType="com.gmsj.common.vo.forecastAnaylse.ItemDetailVO" >
+    SELECT
+        type AS item,
+        value AS value
+    FROM
+        influence_factor
+    WHERE
+        factor_type = #{factorType}
+  </select>
+
+
+</mapper>

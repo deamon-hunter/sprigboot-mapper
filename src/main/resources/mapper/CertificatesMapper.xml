@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gmsj.mapper.CertificatesMapper" >
+  <resultMap id="BaseResultMap" type="com.gmsj.model.Certificates" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="colliery_id" property="collieryId" jdbcType="BIGINT" />
+    <result column="license_number" property="licenseNumber" jdbcType="VARCHAR" />
+    <result column="license_start" property="licenseStart" jdbcType="DATE" />
+    <result column="license_end" property="licenseEnd" jdbcType="DATE" />
+    <result column="license_scale" property="licenseScale" jdbcType="VARCHAR" />
+    <result column="mining_area" property="miningArea" jdbcType="VARCHAR" />
+    <result column="inflection_coordinate" property="inflectionCoordinate" jdbcType="VARCHAR" />
+    <result column="mining_depth" property="miningDepth" jdbcType="VARCHAR" />
+    <result column="license_issue_date" property="licenseIssueDate" jdbcType="DATE" />
+    <result column="safe_license_number" property="safeLicenseNumber" jdbcType="VARCHAR" />
+    <result column="safe_license_start" property="safeLicenseStart" jdbcType="DATE" />
+    <result column="safe_license_end" property="safeLicenseEnd" jdbcType="DATE" />
+    <result column="safe_license_scale" property="safeLicenseScale" jdbcType="VARCHAR" />
+    <result column="business_license_number" property="businessLicenseNumber" jdbcType="VARCHAR" />
+    <result column="economic_type" property="economicType" jdbcType="VARCHAR" />
+    <result column="business_license_start" property="businessLicenseStart" jdbcType="DATE" />
+    <result column="business_license_end" property="businessLicenseEnd" jdbcType="DATE" />
+    <result column="approval_number" property="approvalNumber" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select id="getTotalStock" resultType="java.lang.Float" >
+  	SELECT
+		SUM(license_scale) AS totalStock
+	FROM
+		certificates
+  </select>
+  
+  <select id="getAllCoalCountByYear" parameterType="java.lang.Integer" resultType="java.lang.Integer" >
+  	SELECT
+		COUNT(1) AS count
+	FROM
+		certificates
+	WHERE
+		YEAR (business_license_start) = #{currentYear}
+  </select>
+  
+  
+  <select id="listCollieryType" parameterType="java.lang.Integer" resultType="com.gmsj.common.vo.CommonVO" >
+	  SELECT
+		  COUNT(1) AS count,
+		  economic_type AS type
+	  FROM
+	 	 certificates
+	  WHERE
+	  	YEAR(business_license_start) <![CDATA[ <= ]]> #{year}
+	  GROUP BY
+		economic_type
+	  ORDER BY
+	  	LENGTH(economic_type) DESC
+  </select>
+
+  <select id="listColleryNumChange" resultType="java.lang.Integer" >
+	  SELECT
+	  	IFNULL(SUM(1),0) AS collieryNum
+	  FROM
+	 	 certificates
+	  WHERE
+	 	 YEAR (business_license_start) <![CDATA[ <= ]]> #{year}
+  </select>
+  
+  <select id="listCoalNumChange" resultType="com.gmsj.common.vo.industryAnaylse.CommonInfoVO" >
+  	SELECT
+		COUNT(1) AS num,
+		CONCAT(YEAR(t.business_license_start),'年') AS YEAR
+	FROM
+		certificates t
+	WHERE
+		YEAR(t.business_license_start) BETWEEN #{startYear} AND #{endYear}
+	GROUP BY
+		year
+  </select>
+  
+  
+
+  
+  
+</mapper>

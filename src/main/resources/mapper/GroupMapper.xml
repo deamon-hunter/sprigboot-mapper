@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gmsj.mapper.GroupMapper" >
+  <resultMap id="BaseResultMap" type="com.gmsj.model.Group" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="is_main_business" property="isMainBusiness" jdbcType="BIT" />
+    <result column="business_license_start" property="businessLicenseStart" jdbcType="DATE" />
+    <result column="business_license_end" property="businessLicenseEnd" jdbcType="DATE" />
+  </resultMap>
+
+  <select id="listGroupNumChangeByRangeYear" resultType="java.lang.Integer" >
+  SELECT
+    IFNULL(SUM(1),0) AS groupNum
+  FROM
+     `group`
+  WHERE
+     YEAR (business_license_start) <![CDATA[ <= ]]> #{year}
+  </select>
+
+</mapper>
